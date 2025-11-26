@@ -32,7 +32,7 @@ async function askLLM(question, contexts) {
       : "NO HAY CONTEXTO DISPONIBLE DE LA BASE DE DATOS.";
 
   const systemPrompt = `
-Eres un asistente inteligente llamado "SheinBot" (por el Plan México).
+Eres un asistente inteligente llamado "Kuali" (por el Plan México).
 Tu objetivo es responder preguntas basándote EXCLUSIVAMENTE en la información proporcionada en el CONTEXTO.
 
 REGLAS:
