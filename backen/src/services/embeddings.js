@@ -5,7 +5,10 @@ const axios = require('axios'); // ✅ Usaremos axios para la petición REST dir
 
 const apiKey = process.env.EMBEDDINGS_API_KEY;
 if (!apiKey) {
-    console.warn("[embeddings] EMBEDDINGS_API_KEY no está definida.");
+  console.warn(
+    "[embeddings] EMBEDDINGS_API_KEY no está definida en el .env. " +
+      "Las llamadas a getEmbedding van a fallar."
+  );
 }
 
 const EMBEDDING_MODEL = "text-embedding-004"; 
@@ -15,9 +18,9 @@ const EMBEDDING_MODEL = "text-embedding-004";
  * * Este método evita los errores de compatibilidad del SDK de Node.
  */
 async function getEmbedding(text) {
-    if (!text || !text.trim()) {
-        throw new Error("Texto vacío para embedding");
-    }
+  if (!text || !text.trim()) {
+    throw new Error("Texto vacío para embedding");
+  }
 
     try {
         // Endpoint REST de Google Generative Language
@@ -60,5 +63,5 @@ async function getEmbedding(text) {
 }
 
 module.exports = {
-    getEmbedding,
+  getEmbedding,
 };
