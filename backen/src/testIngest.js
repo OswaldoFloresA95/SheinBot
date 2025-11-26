@@ -4,8 +4,8 @@ const { ingestUrls } = require("./services/ingest");
 
 async function main() {
   const urls = [
-    "https://example.com", // cámbialas por las URLs reales que quieras ingestar
-    // "https://otra-url.com",
+    "https://programasparaelbienestar.gob.mx/",
+    "https://www.gob.mx/becasbenitojuarez",
   ];
 
   console.log("[testIngest] Empezando ingesta de URLs:", urls);
