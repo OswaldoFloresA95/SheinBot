@@ -3,11 +3,11 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/index');
-// 💡 Importamos la función de tu servicio de embeddings.js (que ya es robusta)
+//  Importamos la función de tu servicio de embeddings.js (que ya es robusta)
 const { getEmbedding } = require('../services/embeddings'); 
 
 router.post('/', async (req, res) => {
-    // ❌ El código de inicialización de Gemini y verificación de clave se quitó de aquí.
+    //    El código de inicialización de Gemini y verificación de clave se quitó de aquí.
     //    Esa lógica reside ahora en services/embeddings.js.
     
     const { text } = req.body;
@@ -24,7 +24,7 @@ router.post('/', async (req, res) => {
         const documentId = docResult.rows[0].id;
         
         // 2. Generar el embedding (vector) usando tu servicio
-        // ⭐ Cambio: Llamamos a la función ya probada de tu archivo embeddings.js
+        //  Cambio: Llamamos a la función ya probada de tu archivo embeddings.js
         const embedding = await getEmbedding(text); 
 
         // 3. Formatear y preparar la inserción

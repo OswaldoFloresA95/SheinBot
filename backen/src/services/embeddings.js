@@ -1,18 +1,18 @@
-// src/services/embeddings.js - ÚLTIMO INTENTO DE SINTAXIS
+// src/services/embeddings.js - SOLUCIÓN DE CONTORNO VÍA REST
 
 require("dotenv").config();
-const { GoogleGenAI } = require("@google/genai");
+const axios = require('axios'); // ✅ Usaremos axios para la petición REST directa
 
 const apiKey = process.env.EMBEDDINGS_API_KEY;
 if (!apiKey) {
     console.warn("[embeddings] EMBEDDINGS_API_KEY no está definida.");
 }
 
-const genAI = new GoogleGenAI({ apiKey }); 
-const embeddingModelName = "text-embedding-004"; 
+const EMBEDDING_MODEL = "text-embedding-004"; 
 
 /**
- * Convierte un texto en un embedding (vector de floats).
+ * Genera el vector embedding para un trozo de texto usando el endpoint REST.
+ * * Este método evita los errores de compatibilidad del SDK de Node.
  */
 async function getEmbedding(text) {
     if (!text || !text.trim()) {
@@ -20,26 +20,42 @@ async function getEmbedding(text) {
     }
 
     try {
-        // ⭐ USAMOS LA FUNCIÓN EMBEDCONTENT DE LA VERSIÓN RECIENTE
-        const response = await genAI.embeddings.embedContent({
-            model: embeddingModelName,
-            content: text, // Sintaxis simple para texto único
+        // Endpoint REST de Google Generative Language
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_MODEL}:embedContent?key=${apiKey}`;
+        
+        // Formato JSON que el endpoint REST espera:
+        const body = {
+            content: { 
+                parts: [{ text: text }] // Array de partes
+            }
+        };
+
+        const response = await axios.post(url, body, {
+            headers: { 'Content-Type': 'application/json' }
         });
 
-        // La respuesta de este endpoint es 'response.embedding.values'
-        const values = response.embedding.values; 
+        // La respuesta del endpoint REST es response.data.embedding.values
+        const values = response.data.embedding.values; 
 
         console.log(
             "[embeddings] Dimensión:",
             values.length,
             "Modelo:",
-            embeddingModelName
+            EMBEDDING_MODEL
         );
 
         return values;
     } catch (err) {
-        console.error("[embeddings] Error al obtener embedding:", err.message);
-        throw new Error("Error al obtener embedding desde Gemini: " + err.message);
+        // Capturamos el error HTTP real de Google (e.g., 401, 403, 400 Bad Request)
+        const errorMsg = err.response?.data?.error?.message || err.message;
+        console.error("[embeddings] Error al obtener embedding:", errorMsg);
+        
+        // Si el error es 400 (Bad Request), significa que la sintaxis JSON sigue mal.
+        if (err.response && err.response.status === 400) {
+             throw new Error("Fallo en el formato de petición JSON al servidor de Google. Revisar la estructura 'content'.");
+        }
+        
+        throw new Error("Error al obtener embedding desde Gemini: " + errorMsg);
     }
 }
 
