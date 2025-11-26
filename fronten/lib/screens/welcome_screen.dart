@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:sheinbot/screens/main_screen.dart';
+import 'package:sheinbot/screens/mexico_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -13,6 +14,17 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
+  // ------------------ Slideshow ------------------
+  final List<String> images = [
+    "assets/images/beca.jpg",
+    "assets/images/campo.jpg",
+    "assets/images/ferro.jpg",
+    "assets/images/salud.jpg",
+  ];
+  int currentIndex = 0;
+  bool visible = true;
+  late Timer _timer;
+
   @override
   void initState() {
     super.initState();
@@ -22,38 +34,67 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
+
+    // Inicializar slideshow
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      setState(() {
+        visible = false; // fade out
+      });
+      Future.delayed(const Duration(milliseconds: 500), () {
+        setState(() {
+          currentIndex = (currentIndex + 1) % images.length;
+          visible = true; // fade in
+        });
+      });
+    });
   }
 
   @override
   void dispose() {
     _animationController.dispose();
+    _timer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Fondo (puedes reemplazar más tarde con un video o animación)
+          // ------------------ Slideshow de fondo ------------------
+          Container(color: Colors.black),
+          AnimatedOpacity(
+            opacity: visible ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+            child: Image.asset(
+              images[currentIndex],
+              width: double.infinity,
+              height: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          // ------------------ Fondo degradado semi-transparente ------------------
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color.fromRGBO(111, 24, 52,1), Color.fromRGBO(46, 9, 24,1)],
+                colors: [
+                  Color.fromRGBO(111, 24, 52, 0.7),
+                  Color.fromRGBO(46, 9, 24, 0.7)
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
           ),
 
-          // Contenido central
+          // ------------------ Contenido central ------------------
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo o icono inicial
-                
+                // Logo
                 Image.asset(
                   'assets/images/logo.png',
                   width: 300,
@@ -61,8 +102,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   fit: BoxFit.contain,
                 ),
 
-               // const SizedBox(height: 5),
+                const SizedBox(height: 10),
 
+                // Texto bienvenida
                 const Text(
                   "Bienvenido al Explorador del Plan México",
                   textAlign: TextAlign.center,
@@ -104,8 +146,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     ),
                   ),
                   onPressed: () {
-                    // Aquí irá la navegación hacia el home o IA
-                    Navigator.push(context, MaterialPageRoute(builder: (_)=> MainMenuScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => PlanMexicoScreen()));
                   },
                   child: const Text(
                     "Comenzar",
