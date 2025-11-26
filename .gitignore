@@ -1,0 +1,36 @@
+# === Backend Node ===
+backen/node_modules/
+backen/npm-debug.log*
+backen/yarn-error.log*
+
+# === Flutter / Dart ===
+fronten/.dart_tool/
+fronten/.packages
+fronten/.flutter-plugins
+fronten/.flutter-plugins-dependencies
+fronten/.metadata
+
+# Salida de compilación Flutter
+fronten/build/
+
+# Android (dentro del proyecto Flutter)
+fronten/android/.gradle/
+fronten/android/local.properties
+fronten/android/app/build/
+
+# iOS (si usas iOS en Flutter)
+fronten/ios/Flutter/Flutter.podspec
+fronten/ios/Flutter/App.framework
+fronten/ios/Flutter/Flutter.framework
+fronten/ios/.symlinks/
+fronten/ios/Pods/
+fronten/ios/Runner/GeneratedPluginRegistrant.*
+fronten/ios/build/
+
+# === Entornos ===
+.env
+**/.env
+
+# === Sistema operativo ===
+.DS_Store
+Thumbs.db
