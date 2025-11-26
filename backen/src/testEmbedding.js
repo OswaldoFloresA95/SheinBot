@@ -1,4 +1,3 @@
-// src/testEmbedding.js
 const { getEmbedding } = require("./services/embeddings");
 
 async function main() {
