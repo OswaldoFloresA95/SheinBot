@@ -4,8 +4,28 @@ const { ingestUrls } = require("./services/ingest");
 
 async function main() {
   const urls = [
-    "https://programasparaelbienestar.gob.mx/",
-    "https://www.gob.mx/becasbenitojuarez",
+    /*"https://www.gob.mx/presidencia/articulos/version-estenografica-conferencia-de-prensa-de-la-presidenta-claudia-sheinbaum-pardo-del-4-de-abril-de-2025",
+    "https://www.gob.mx/presidencia/articulos/version-estenografica-conferencia-de-prensa-de-la-presidenta-claudia-sheinbaum-pardo-del-9-de-abril-de-2025",
+    "https://www.dof.gob.mx/nota_detalle.php?codigo=5758077&fecha=22/05/2025#gsc.tab=0",
+    "https://www.dof.gob.mx/nota_detalle.php?codigo=5758079&fecha=22/05/2025#gsc.tab=0",
+    "https://www.gob.mx/presidencia/prensa/plan-mexico-presidenta-claudia-sheinbaum-pone-en-marcha-los-primeros-15-polos-de-desarrollo-economico-para-el-bienestar-en-14-estados",
+    "https://www.gob.mx/presidencia/prensa/presidenta-firma-acuerdo-con-22-grupos-empresariales-para-aumentar-los-productos-hechos-en-mexico-en-tiendas?idiom=es",
+    "https://www.gob.mx/presidencia/prensa/plan-mexico-presidenta-claudia-sheinbaum-anuncia-decreto-para-convertir-al-pais-en-lider-de-la-industria-farmaceutica",
+    "https://www.gob.mx/shcp/prensa/comunicado-no-19-suscriben-acuerdo-el-gobierno-federal-banco-de-mexico-y-la-abm-para-incrementar-el-financiamiento-a-las-pymes?idiom=es-MX",
+    "https://www.gob.mx/presidencia/prensa/se-ofertaran-100-mil-empleos-adicionales-como-parte-del-plan-mexico-presidenta-claudia-sheinbaum?idiom=es",
+*/
+    "https://mextudia.com/becas-gubernamentales-en-mexico/",
+    "https://miestatusbienestar.com.mx/mujeres-con-bienestar/",
+    "https://www.infobae.com/mexico/2025/03/19/beneficios-y-apoyos-para-mujeres-en-2025-lista-completa-de-cuantos-hay-y-cuanto-dinero-ofrecen/",
+    "https://www.gob.mx/cms/uploads/attachment/file/964733/100_compromisos.pdf",
+    "https://www.proyectosmexico.gob.mx/ppp06-tren-mexico-pachuca/",
+    "https://www.proyectosmexico.gob.mx/ppp07-tren-mexico-queretaro/",
+    "https://www.trenmaya.gob.mx/images/documentos/Programa%20Institucional_Tren%20Maya%202025.pdf",
+    "https://www.gob.mx/ciit",
+    "https://codeso.mx/plan-sonora/",
+    "https://www.gob.mx/conavi/acciones-y-programas/programa-de-vivienda-para-el-bienestar-2025",
+    
+
   ];
 
   console.log("[testIngest] Empezando ingesta de URLs:", urls);

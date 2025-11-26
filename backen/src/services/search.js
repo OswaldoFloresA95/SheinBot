@@ -1,5 +1,5 @@
 // src/services/search.js
-const db = require("../db");
+const db = require("../db/index"); // Aseguramos la ruta explícita por si acaso
 
 /**
  * Convierte un array de números JS en un literal de vector para Postgres/pgvector:
@@ -26,14 +26,16 @@ async function searchRelevantChunks(questionEmbedding, limit = 5) {
   // Convertimos el array JS a literal de vector para pgvector
   const embeddingLiteral = toVectorLiteral(questionEmbedding);
 
+  // ⭐ CAMBIO: Usamos <=> (Distancia Coseno) en lugar de <-> (Euclidiana)
+  // Esto mejora la precisión semántica para respuestas de IA.
   const sql = `
-    SELECT
-      id,
-      document_id,
-      content,
-      (embedding <-> $1::vector) AS score
+    SELECT 
+      id, 
+      document_id, 
+      content, 
+      (embedding <=> $1::vector) AS distance
     FROM public.chunks
-    ORDER BY embedding <-> $1::vector
+    ORDER BY distance ASC
     LIMIT $2;
   `;
 
