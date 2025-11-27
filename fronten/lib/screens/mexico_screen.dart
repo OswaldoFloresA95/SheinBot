@@ -38,11 +38,11 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     "Apoyos\nEconómicos":
         "El gobierno de México ofrece una variedad de programas de apoyo económico a través de la Secretaría del Bienestar, destinados a reducir la pobreza y mejorar el bienestar de la población.\n\nProgramas de Bienestar\n∘ Pensión para Adultos Mayores: Dirigido a personas de 65 años o más, sin importar su condición laboral.\n∘ Sembrando Vida: Proporciona apoyos económicos y en especie a sujetos agrarios mayores de edad.\n∘ Becas para Educación: Becas a estudiantes de educación básica, media superior y superior.\n∘ Apoyos para Madres Trabajadoras: Apoyo a madres trabajadoras.",
 
-    "Capacitaciones\n":
-        "",
+    "Sitio Web":
+        "Escanea el QR para acceder al sitio oficial del Plan México y conocer requisitos, apoyos y enlaces útiles.",
 
     "Construcción de\nCarreteras":
-        "",
+        "Plan México impulsa la red carretera y logística con 8 proyectos (1,970 km) y mantenimiento por 34,348 mdp en 2025. Se modernizan ejes troncales, libramientos y tramos clave (Pachuca-Huejutla, Tepic-Compostela, Mitla-Tehuantepec), además de caminos artesanales y expansión aeroportuaria.\n\nObjetivos\n∘ Conectar Polos de Bienestar con puertos y fronteras\n∘ Restaurar 44 mil km de red federal (programa “Bachetón”)\n∘ Mejorar conectividad para turismo, comercio y comunidades",
 
     "Empleos en mi\nLocalidad":
         "\"Jóvenes Construyendo el Futuro\" es un programa del Gobierno de México que ofrece capacitación laboral y apoyo económico a jóvenes de entre 18 y 29.\nEl programa tiene como objetivo principal brindar oportunidades de desarrollo profesional a jóvenes, ayudándoles a adquirir habilidades y experiencia laboral en diferentes sectores.\n\nBeneficios de los Participantes\n∘ Apoyo económico\n∘ Seguro medico\n∘ Capacitación\n\nOportunidades Laborales\n∘ Trabajos Administrativos\n∘ Ventas y Comercio\n∘ Oficios",
@@ -265,6 +265,8 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
         miniTexts[title] ??
         "Aquí podrás ver más información relacionada con esta sección.";
 
+    final bool isSitioWeb = title.trim().startsWith("Sitio Web");
+
     // TTS para el botón Plan México
     if (title.trim().startsWith("Plan México")) {
       _speak(
@@ -272,8 +274,17 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
       );
     }
 
+    if (title.trim().startsWith("Apoyos\nEconómicos")) {
+      _speak("A continuación te muestro las opciones de apoyos económicos que nos ofrece el gobierno.");
+    }
+    if (title.trim().startsWith("Empleos en mi\nLocalidad")) {
+      _speak("Gracias al Programa Jóvenes construyendo el futuro miles de jóvenes mexicanos podrán capacitarse mientras trabajan en empleos de su localidad.");
+    }
     if (title.trim().startsWith("Polos de\nBienestar")) {
       _speak("WiWiWi");
+    }
+    if (title.trim().startsWith("Construcción de\nCarreteras")) {
+      _speak("Éstas son algunas de las carreteras que se han construido y remodelado con el plan México.");
     }
 
     final size = MediaQuery.of(context).size; // ancho/alto de la pantalla
@@ -314,18 +325,42 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        ValueListenableBuilder<String>(
-                          valueListenable: _miniFrameText,
-                          builder: (_, value, __) {
-                            return Text(
-                              value,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.black87,
+                        if (isSitioWeb)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _miniFrameText.value.isNotEmpty
+                                    ? _miniFrameText.value
+                                    : "Escanea el código para visitar el sitio.",
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black87,
+                                ),
                               ),
-                            );
-                          },
-                        ),
+                              const SizedBox(height: 16),
+                              Center(
+                                child: Image.asset(
+                                  "assets/images/qr.jpeg",
+                                  height: 320,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          ValueListenableBuilder<String>(
+                            valueListenable: _miniFrameText,
+                            builder: (_, value, __) {
+                              return Text(
+                                value,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.black87,
+                                ),
+                              );
+                            },
+                          ),
                       ],
                     ),
                   ),
@@ -429,8 +464,8 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           buildIconButton(
-                            Icons.school_rounded,
-                            "Capacitaciones\n",
+                            Icons.language_rounded,
+                            "Sitio Web",
                             const Color.fromARGB(255, 142, 51, 51),
                           ),
                           buildIconButton(
@@ -548,8 +583,8 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
             // ------------------ MASCOTA ------------------
             Positioned(
               bottom: 0,
-              left: 15,
-              child: Image.asset("assets/images/chat.jpeg", height: 200),
+              left: -20, // más hacia la izquierda
+              child: Image.asset("assets/images/kualli.gif", height: 200),
             ),
 
             // ------------------ MICRÓFONO ------------------
