@@ -10,7 +10,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   List<Map<String, String>> messages = [
     {
       "sender": "bot",
-      "text": "¡Hola! Soy tu asistente. ¿En qué puedo ayudarte hoy?",
+      "text": "¡Hola! Soy Kualli. ¿Conoces acerca del PLAN MÉXICO?",
     },
   ];
 
@@ -108,24 +108,102 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     listeningMsgIndex = null;
   }
 
+  // ------------------ MINI FRAME SOBRE LOS BOTONES ------------------
+  void _openMiniFrame(String title) {
+    final size = MediaQuery.of(context).size; // ancho/alto de la pantalla
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) {
+        return Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: size.width * 0.9,   // antes 360
+            height: size.height * 0.6,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 255, 255, 255),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 24, 80),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF0A1A3B),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "Aquí podrás ver más información relacionada con esta sección.",
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 12,
+                    right: 12,
+                    child: Image.asset(
+                      "assets/images/pc.jpeg",
+                      height: 180,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   // ------------------ WIDGET BOTONES ------------------
-  Widget buildIconButton(String imagePath, String label, Color color) {
-    return Column(
-      children: [
-        Container(
-          width: 170,
-          height: 170,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: color, // color personalizado
+  Widget buildIconButton(IconData icon, String label, Color color) {
+    return GestureDetector(
+      onTap: () => _openMiniFrame(label),
+      child: Column(
+        children: [
+          Container(
+            width: 170,
+            height: 170,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color, // color personalizado
+            ),
+            child: Center(
+              child: Icon(
+                icon,
+                size: 90,
+                color: Colors.white,
+              ),
+            ),
           ),
-          child: Center(
-            child: Image.asset(imagePath, width: 125, height: 125),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
           ),
-        ),
-        const SizedBox(height: 5),
-        Text(label, style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600)),
-      ],
+        ],
+      ),
     );
   }
 
@@ -141,7 +219,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                 // ------------------ TITULO ------------------
                 Container(
                   width: double.infinity,
-                  color: const Color.fromARGB(255, 51, 134, 128),
+                  color: const Color.fromARGB(255, 142, 51, 51),
                   padding: const EdgeInsets.symmetric(vertical: 40),
                   child: Center(
                     child: Text(
@@ -165,11 +243,20 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           buildIconButton(
-                              "assets/images/mexico.png", "Obras en\ntu comunidad", Colors.purple.shade300),
+                            Icons.flag_rounded,
+                            "Plan México\n",
+                            const Color.fromARGB(255, 213, 112, 112),
+                          ),
                           buildIconButton(
-                              "assets/images/datos.png", "Apoyos y\nservicios", const Color.fromARGB(255, 72, 177, 77)),
+                            Icons.location_city_rounded,
+                            "Polos de\nBienestar",
+                            const Color.fromARGB(255, 184, 81, 81),
+                          ),
                           buildIconButton(
-                              "assets/images/info.png", "Botón 3", const Color.fromARGB(255, 246, 163, 100)),
+                            Icons.volunteer_activism_rounded,
+                            "Apoyos\nEconómicos",
+                            const Color.fromARGB(255, 142, 51, 51),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 50),
@@ -177,11 +264,20 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           buildIconButton(
-                              "assets/images/planta.png", "Botón 4", Colors.orange.shade300),
+                            Icons.school_rounded,
+                            "Capacitaciones\n",
+                            const Color.fromARGB(255, 142, 51, 51),
+                          ),
                           buildIconButton(
-                              "assets/images/chalan.png", "Botón 5", const Color.fromARGB(255, 133, 172, 249)),
+                            Icons.alt_route_rounded,
+                            "Construcción de\nCarreteras",
+                            const Color.fromARGB(255, 184, 81, 81),
+                          ),
                           buildIconButton(
-                              "assets/images/mexico.png", "Botón 6", const Color.fromARGB(255, 175, 255, 118)),
+                            Icons.work_rounded,
+                            "Empleos en mi\nLocalidad",
+                            const Color.fromARGB(255, 213, 112, 112),
+                          ),
                         ],
                       ),
                     ],
@@ -219,10 +315,15 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 14, horizontal: 18),
-                                  constraints: const BoxConstraints(maxWidth: 330),
-                                  child: Text(msg["text"]!,
-                                      style: TextStyle(
-                                          fontSize: 25, color: Colors.black87)),
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 330),
+                                  child: Text(
+                                    msg["text"]!,
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -263,7 +364,11 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                     color: Colors.red.shade400,
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: Colors.black26, blurRadius: 8, spreadRadius: 1)
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      )
                     ],
                   ),
                   child: Icon(Icons.mic, color: Colors.white, size: 80),
