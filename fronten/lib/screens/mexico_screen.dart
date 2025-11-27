@@ -19,8 +19,11 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
 
   String partialText = "";
   int? listeningMsgIndex;
+  int? _typingMsgIndex;
   late stt.SpeechToText speech;
   bool isListening = false;
+  bool _isStopping = false;
+  bool _botTyping = false;
   final ChatService _chatService = ChatService();
   final ValueNotifier<String> _miniFrameText = ValueNotifier<String>(
       "Aquí podrás ver más información relacionada con esta sección.");
@@ -54,7 +57,65 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     scrollToBottom();
   }
 
-  String _trimWords(String text, int maxWords) {
+  void _startTypingPlaceholder() {
+    setState(() {
+      _botTyping = true;
+      messages.add({"sender": "bot", "text": "..."});
+      _typingMsgIndex = messages.length - 1;
+      if (messages.length > 20) messages.removeAt(0);
+    });
+    scrollToBottom();
+  }
+
+  Future<void> _typeOutText(String fullText,
+      {Duration step = const Duration(milliseconds: 80)}) async {
+    if (_typingMsgIndex == null) return;
+    final words = fullText.split(RegExp(r'\\s+')).where((w) => w.isNotEmpty);
+    String current = "";
+    for (final word in words) {
+      current = (current + " " + word).trim();
+      if (_typingMsgIndex == null) break;
+      setState(() {
+        messages[_typingMsgIndex!]["text"] = current;
+      });
+      await Future.delayed(step);
+    }
+    setState(() {
+      _botTyping = false;
+      _typingMsgIndex = null;
+    });
+  }
+
+  String _shortenResponse(
+    String text, {
+    int maxWords = 60,
+    int minFirstSentenceWords = 8,
+  }) {
+    // Separa por punto/exclamación/interrogación aun sin espacio después.
+    final sentences = text
+        .split(RegExp(r'(?<=[.!?])\s*'))
+        .map((s) => s.trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+
+    if (sentences.isNotEmpty) {
+      final first = sentences.first;
+      final firstWordCount = first.split(RegExp(r'\s+')).length;
+
+      // Si la primera oración es muy corta y hay otra, combinar ambas.
+      if (firstWordCount < minFirstSentenceWords && sentences.length > 1) {
+        final combined = '$first ${sentences[1]}'.trim();
+        final combinedWords = combined.split(RegExp(r'\s+'));
+        if (combinedWords.length <= maxWords) {
+          return combined;
+        }
+        return combinedWords.take(maxWords).join(' ') + '...';
+      }
+
+      if (firstWordCount <= maxWords) return first;
+    }
+
+    // Si no hay puntos o es muy largo, recorta por número de palabras.
     final words = text.split(RegExp(r'\s+'));
     if (words.length <= maxWords) return text;
     return words.take(maxWords).join(' ') + '...';
@@ -70,11 +131,25 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     final query = text.trim();
     if (query.isEmpty) return;
     if (logInChat) addUserMessage(query);
-    final response = await _chatService.sendMessage(query);
-    if (updateMini) {
-      _miniFrameText.value = _trimWords(response, miniMaxWords);
+    if (logInChat) _startTypingPlaceholder();
+    try {
+      final response = await _chatService.sendMessage(query);
+      if (updateMini) {
+        _miniFrameText.value =
+            _shortenResponse(response, maxWords: miniMaxWords);
+      }
+      if (logInChat) {
+        final shortened = _shortenResponse(response, maxWords: botMaxWords);
+        await _typeOutText(shortened);
+        // Si por alguna razón no se tipió, aseguramos mensaje.
+        if (_typingMsgIndex == null && !_botTyping) {
+          addBotMessage(shortened);
+        }
+      }
+    } catch (e) {
+      if (updateMini) _miniFrameText.value = "Error de conexión: $e";
+      if (logInChat) addBotMessage("Error de conexión: $e");
     }
-    if (logInChat) addBotMessage(_trimWords(response, botMaxWords));
   }
 
   void scrollToBottom() {
@@ -94,7 +169,12 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     if (isListening) return;
 
     bool available = await speech.initialize(
-      onStatus: (status) {},
+      onStatus: (status) {
+        // Cuando el reconocimiento termina por tiempo/silencio, enviamos lo capturado.
+        if (status == "notListening") {
+          stopListening();
+        }
+      },
       onError: (e) => print("Error: $e"),
     );
     if (!available) return;
@@ -121,7 +201,8 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   }
 
   void stopListening() async {
-    if (!isListening) return;
+    if (!isListening || _isStopping) return;
+    _isStopping = true;
 
     await speech.stop();
     setState(() {
@@ -134,12 +215,13 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
 
     partialText = "";
     listeningMsgIndex = null;
+    _isStopping = false;
   }
 
   // ------------------ MINI FRAME SOBRE LOS BOTONES ------------------
   void _openMiniFrame(String title) {
-    _miniFrameText.value = 'Consultando sobre "$title"...';
-    _sendToBackend(title, updateMini: true, logInChat: false);
+    _miniFrameText.value = 'Pensando...';
+    _sendToBackend(title.trim(), updateMini: true, logInChat: false);
 
     final size = MediaQuery.of(context).size; // ancho/alto de la pantalla
     showDialog(
@@ -220,8 +302,8 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
       child: Column(
         children: [
           Container(
-            width: 170,
-            height: 170,
+            width: 100,
+            height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: color, // color personalizado
@@ -229,7 +311,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
             child: Center(
               child: Icon(
                 icon,
-                size: 90,
+                size: 50,
                 color: Colors.white,
               ),
             ),
