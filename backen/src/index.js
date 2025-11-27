@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Aquí deben estar montadas las rutas 👇
+// Aquí deben estar montadas las rutas
 app.use('/ingest', ingestRoutes);
 app.use('/chat', chatRoutes);
 

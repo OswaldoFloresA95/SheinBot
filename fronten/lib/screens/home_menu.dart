@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class HomeMenuScreen extends StatefulWidget {
+  const HomeMenuScreen({super.key});
+
   @override
   State<HomeMenuScreen> createState() => _HomeMenuScreenState();
 }
