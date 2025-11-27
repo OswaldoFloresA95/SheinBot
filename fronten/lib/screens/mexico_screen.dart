@@ -36,16 +36,16 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
         "Los Polos del Bienestar son espacios creados en diferentes regiones de México donde se desarrollan proyectos que impulsan el crecimiento económico y social.\nSu idea principal es llevar oportunidades a zonas que antes tenían poco apoyo, para que más personas puedan trabajar, aprender y mejorar su calidad de vida sin tener que mudarse lejos.",
 
     "Apoyos\nEconómicos":
-        "El Gobierno de México otorga apoyos económicos directos a personas y pequeños productores mediante programas sociales y productivos, como los destinados a la agricultura de pequeña escala, créditos accesibles y ayuda a familias en situación de vulnerabilidad. Estos apoyos buscan reforzar el ingreso, la seguridad alimentaria y la permanencia en las comunidades.",
+        "El gobierno de México ofrece una variedad de programas de apoyo económico a través de la Secretaría del Bienestar, destinados a reducir la pobreza y mejorar el bienestar de la población.\n\nProgramas de Bienestar\n∘ Pensión para Adultos Mayores: Dirigido a personas de 65 años o más, sin importar su condición laboral.\n∘ Sembrando Vida: Proporciona apoyos económicos y en especie a sujetos agrarios mayores de edad.\n∘ Becas para Educación: Becas a estudiantes de educación básica, media superior y superior.\n∘ Apoyos para Madres Trabajadoras: Apoyo a madres trabajadoras.",
 
     "Capacitaciones\n":
-        "Existen programas públicos de capacitación para el trabajo y formación en habilidades técnicas y digitales, tanto presenciales como en línea. A través de cursos, talleres y esquemas de aprendizaje en centros de trabajo, se busca que más personas puedan mejorar su perfil laboral, obtener un empleo formal o emprender actividades productivas propias.",
+        "",
 
     "Construcción de\nCarreteras":
-        "La construcción y modernización de carreteras federales, caminos rurales y alimentadores forma parte de los programas nacionales de infraestructura. Estas obras tienen el objetivo de conectar mejor regiones aisladas, facilitar el transporte de personas y mercancías, reducir tiempos de traslado y apoyar el desarrollo económico y social de las comunidades.",
+        "",
 
     "Empleos en mi\nLocalidad":
-        "El Gobierno impulsa la generación de empleos a nivel local mediante nuevos proyectos de infraestructura, polos industriales y programas de inversión regional, además de herramientas como el Servicio Nacional de Empleo y bolsas de trabajo oficiales. A través de estas iniciativas se busca que las personas encuentren oportunidades laborales cerca de donde viven.",
+        "\"Jóvenes Construyendo el Futuro\" es un programa del Gobierno de México que ofrece capacitación laboral y apoyo económico a jóvenes de entre 18 y 29.\nEl programa tiene como objetivo principal brindar oportunidades de desarrollo profesional a jóvenes, ayudándoles a adquirir habilidades y experiencia laboral en diferentes sectores.\n\nBeneficios de los Participantes\n∘ Apoyo económico\n∘ Seguro medico\n∘ Capacitación\n\nOportunidades Laborales\n∘ Trabajos Administrativos\n∘ Ventas y Comercio\n∘ Oficios",
   };
 
   @override

@@ -112,8 +112,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _animationController.dispose();
     _kualliController.dispose();
     _timer.cancel();
-    _greetTimer?.cancel();
-    _tts.stop();
+    _stopGreetings();
     super.dispose();
   }
 
@@ -150,6 +149,12 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _greetTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       _speakNextGreeting();
     });
+  }
+
+  void _stopGreetings() {
+    _greetTimer?.cancel();
+    _greetTimer = null;
+    _tts.stop();
   }
 
   @override
@@ -332,6 +337,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ),
                         onPressed: () {
+                          _stopGreetings();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
