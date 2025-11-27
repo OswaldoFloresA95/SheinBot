@@ -27,6 +27,19 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   final ChatService _chatService = ChatService();
   final ValueNotifier<String> _miniFrameText = ValueNotifier<String>(
       "Aquí podrás ver más información relacionada con esta sección.");
+  final Map<String, String> miniTexts = {
+    "Plan México\n": "Plan México es una estrategia de largo plazo para impulsar el desarrollo regional del país: busca atraer inversiones, relocalizar industrias, aumentar el contenido nacional en lo que producimos y crear empleos bien remunerados en sectores clave, aprovechando las vocaciones productivas de cada región.",
+
+"Polos de\nBienestar": "Los Polos de Bienestar son zonas del país donde se concentran inversiones en infraestructura, industria y servicios para descentralizar el crecimiento económico. En estos polos se promueven parques industriales, servicios básicos y conectividad para generar empleo local y mejorar la calidad de vida de las comunidades cercanas.",
+
+"Apoyos\nEconómicos": "El Gobierno de México otorga apoyos económicos directos a personas y pequeños productores mediante programas sociales y productivos, como los destinados a la agricultura de pequeña escala, créditos accesibles y ayuda a familias en situación de vulnerabilidad. Estos apoyos buscan reforzar el ingreso, la seguridad alimentaria y la permanencia en las comunidades.",
+
+"Capacitaciones\n": "Existen programas públicos de capacitación para el trabajo y formación en habilidades técnicas y digitales, tanto presenciales como en línea. A través de cursos, talleres y esquemas de aprendizaje en centros de trabajo, se busca que más personas puedan mejorar su perfil laboral, obtener un empleo formal o emprender actividades productivas propias.",
+
+"Construcción de\nCarreteras": "La construcción y modernización de carreteras federales, caminos rurales y alimentadores forma parte de los programas nacionales de infraestructura. Estas obras tienen el objetivo de conectar mejor regiones aisladas, facilitar el transporte de personas y mercancías, reducir tiempos de traslado y apoyar el desarrollo económico y social de las comunidades.",
+
+"Empleos en mi\nLocalidad": "El Gobierno impulsa la generación de empleos a nivel local mediante nuevos proyectos de infraestructura, polos industriales y programas de inversión regional, además de herramientas como el Servicio Nacional de Empleo y bolsas de trabajo oficiales. A través de estas iniciativas se busca que las personas encuentren oportunidades laborales cerca de donde viven."
+  };
 
   @override
   void initState() {
@@ -220,8 +233,9 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
 
   // ------------------ MINI FRAME SOBRE LOS BOTONES ------------------
   void _openMiniFrame(String title) {
-    _miniFrameText.value = 'Pensando...';
-    _sendToBackend(title.trim(), updateMini: true, logInChat: false);
+    // Toma el texto definido para este botón; editable en miniTexts.
+    _miniFrameText.value = miniTexts[title] ??
+        "Aquí podrás ver más información relacionada con esta sección.";
 
     final size = MediaQuery.of(context).size; // ancho/alto de la pantalla
     showDialog(
