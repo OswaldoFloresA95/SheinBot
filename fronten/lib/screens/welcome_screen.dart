@@ -12,8 +12,10 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _animationController;
+  late AnimationController _kualliController;
+  late Animation<Offset> _kualliSlide;
 
   // ------------------ Slideshow ------------------
   final List<String> images = [
@@ -35,11 +37,29 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   void initState() {
     super.initState();
 
+    // Precargar imágenes para evitar parpadeos y asegurarnos que carguen.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      precacheImage(const AssetImage("assets/images/kualli.gif"), context);
+      precacheImage(const AssetImage("assets/images/logo.png"), context);
+    });
+
     // Animación tipo "Siri pulse"
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..repeat(reverse: true);
+
+    _kualliController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+
+    _kualliSlide = Tween<Offset>(
+      begin: const Offset(0, -0.04),
+      end: const Offset(0, 0.04),
+    ).animate(
+      CurvedAnimation(parent: _kualliController, curve: Curves.easeInOut),
+    );
 
     // Slideshow con movimiento diagonal
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
@@ -67,6 +87,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void dispose() {
     _animationController.dispose();
+    _kualliController.dispose();
     _timer.cancel();
     super.dispose();
   }
@@ -143,20 +164,33 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Logo superior
-                  Image.asset(
-                    'assets/images/logo.png',
-                    width: 180,
-                    height: 180,
-                    fit: BoxFit.contain,
+                  // Kualli centrado (GIF) con vaivén vertical, más grande y arriba
+                  SlideTransition(
+                    position: _kualliSlide,
+                    child: Transform.translate(
+                      offset: const Offset(0, -12),
+                      child: Image.asset(
+                        "assets/images/kualli.gif",
+                        height: 280,
+                        fit: BoxFit.contain,
+                        gaplessPlayback: true,
+                        errorBuilder: (_, __, ___) => const Text(
+                          "Kualli no pudo cargar",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 24),
 
-                  // Kualli centrado
+                  // Logo debajo de Kualli, más abajo
                   Image.asset(
-                    "assets/images/dos.png",
-                    height: 200,
+                    'assets/images/logo.png',
+                    width: 160,
+                    height: 160,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                   ),
 
                   const SizedBox(height: 16),
@@ -252,7 +286,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 size: 24, color: Colors.white),
                             SizedBox(width: 8),
                             Text(
-                              "Comenzar recorrido",
+                              "---------------->",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 21,
