@@ -11,7 +11,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   List<Map<String, String>> messages = [
     {
       "sender": "bot",
-      "text": "¡Hola! Soy Kualli. ¿Conoces acerca del PLAN MÉXICO?",
+      "text": "¡Hola! Soy Kualli. ",
     },
   ];
 
@@ -28,9 +28,9 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   final ValueNotifier<String> _miniFrameText = ValueNotifier<String>(
       "Aquí podrás ver más información relacionada con esta sección.");
   final Map<String, String> miniTexts = {
-    "Plan México\n": "Plan México es una estrategia de largo plazo para impulsar el desarrollo regional del país: busca atraer inversiones, relocalizar industrias, aumentar el contenido nacional en lo que producimos y crear empleos bien remunerados en sectores clave, aprovechando las vocaciones productivas de cada región.",
+    "Plan México\n": "El Plan México es una estrategia nacional que busca impulsar el crecimiento del país y mejorar la vida de las personas. \n\n¿Cómo lo hace?\n∘ Creando más empleos y fortaleciendo la industria mexicana.\n ∘ Atrayendo inversiones para construir carreteras, trenes, puertos, energía y más infraestructura.\n∘ Aumentando la producción en México, para depender menos del extranjero.\n∘ Impulsando la educación, ciencia y tecnología, para que más personas tengan oportunidades de estudiar y trabajar.\n∘ Reduciendo desigualdades, llevando desarrollo a todas las regiones del país.",
 
-"Polos de\nBienestar": "Los Polos de Bienestar son zonas del país donde se concentran inversiones en infraestructura, industria y servicios para descentralizar el crecimiento económico. En estos polos se promueven parques industriales, servicios básicos y conectividad para generar empleo local y mejorar la calidad de vida de las comunidades cercanas.",
+"Polos de\nBienestar": "Los Polos del Bienestar son espacios creados en diferentes regiones de México donde se desarrollan proyectos que impulsan el crecimiento económico y social.\nSu idea principal es llevar oportunidades a zonas que antes tenían poco apoyo, para que más personas puedan trabajar, aprender y mejorar su calidad de vida sin tener que mudarse lejos.\n∘ Cada Polo del Bienestar puede incluir:\n∘ Capacitación y educación para jóvenes y adultos.\n∘ Impulso a pequeñas empresas y emprendedores.\n∘ Proyectos productivos, como agricultura, manufactura o tecnología.\n∘ Espacios comunitarios que ayudan a mejorar el entorno.",
 
 "Apoyos\nEconómicos": "El Gobierno de México otorga apoyos económicos directos a personas y pequeños productores mediante programas sociales y productivos, como los destinados a la agricultura de pequeña escala, créditos accesibles y ayuda a familias en situación de vulnerabilidad. Estos apoyos buscan reforzar el ingreso, la seguridad alimentaria y la permanencia en las comunidades.",
 
@@ -80,23 +80,26 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     scrollToBottom();
   }
 
-  Future<void> _typeOutText(String fullText,
+  Future<bool> _typeOutText(String fullText,
       {Duration step = const Duration(milliseconds: 80)}) async {
-    if (_typingMsgIndex == null) return;
+    if (_typingMsgIndex == null) return false;
     final words = fullText.split(RegExp(r'\\s+')).where((w) => w.isNotEmpty);
     String current = "";
+    bool wrote = false;
     for (final word in words) {
       current = (current + " " + word).trim();
       if (_typingMsgIndex == null) break;
       setState(() {
         messages[_typingMsgIndex!]["text"] = current;
       });
+      wrote = true;
       await Future.delayed(step);
     }
     setState(() {
       _botTyping = false;
       _typingMsgIndex = null;
     });
+    return wrote;
   }
 
   String _shortenResponse(
@@ -153,11 +156,8 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
       }
       if (logInChat) {
         final shortened = _shortenResponse(response, maxWords: botMaxWords);
-        await _typeOutText(shortened);
-        // Si por alguna razón no se tipió, aseguramos mensaje.
-        if (_typingMsgIndex == null && !_botTyping) {
-          addBotMessage(shortened);
-        }
+        final typed = await _typeOutText(shortened);
+        if (!typed) addBotMessage(shortened);
       }
     } catch (e) {
       if (updateMini) _miniFrameText.value = "Error de conexión: $e";
