@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../services/chat_service.dart';
 
@@ -25,6 +26,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   bool _isStopping = false;
   bool _botTyping = false;
   final ChatService _chatService = ChatService();
+  final FlutterTts _tts = FlutterTts();
   final ValueNotifier<String> _miniFrameText = ValueNotifier<String>(
       "Aquí podrás ver más información relacionada con esta sección.");
   final Map<String, String> miniTexts = {
@@ -45,13 +47,29 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   void initState() {
     super.initState();
     speech = stt.SpeechToText();
+    _initTts();
   }
 
   @override
   void dispose() {
     speech.stop();
+    _tts.stop();
     _miniFrameText.dispose();
     super.dispose();
+  }
+
+  Future<void> _initTts() async {
+    await _tts.setLanguage("es-MX");
+    await _tts.setPitch(1.4);      // tono más agudo/adorable
+    await _tts.setSpeechRate(0.45); // ritmo un poco más lento
+    await _tts.setVolume(1.0);
+    await _tts.awaitSpeakCompletion(true);
+  }
+
+  Future<void> _speak(String text) async {
+    if (text.trim().isEmpty) return;
+    await _tts.stop();
+    await _tts.speak(text);
   }
 
   void addUserMessage(String text) {
@@ -236,6 +254,17 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     // Toma el texto definido para este botón; editable en miniTexts.
     _miniFrameText.value = miniTexts[title] ??
         "Aquí podrás ver más información relacionada con esta sección.";
+
+    // TTS para el botón Plan México
+    if (title.trim().startsWith("Plan México")) {
+      _speak(
+          "El Plan México quiere que México sea más fuerte, más justo y con mejores oportunidades para todas y todos.");
+    }
+
+    if (title.trim().startsWith("Polos de\nBienestar")) {
+      _speak(
+          "WiWiWi");
+    }
 
     final size = MediaQuery.of(context).size; // ancho/alto de la pantalla
     showDialog(
