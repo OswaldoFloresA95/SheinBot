@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:sheinbot/screens/mexico_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -16,6 +18,23 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   late AnimationController _animationController;
   late AnimationController _kualliController;
   late Animation<Offset> _kualliSlide;
+  late FlutterTts _tts;
+  bool _ttsReady = false;
+  Timer? _greetTimer;
+  int _greetIndex = 0;
+  final List<String> _greetings = const [
+    "Hola",
+    "Hola, hola, ¿hay alguien ahí?",
+    "Ven a conocer el plan México.",
+    "Hola, ¿cómo estás?",
+    "Hola, ¡ven a platicar conmigo!",
+    "Hey, Hey, Hey",
+    "¿Tienes dudas?, ¡Pregúntame!",
+    "Oportunidades para ti",
+    "Ofertas Laborales",
+    "No dejes ir tu beca",
+    
+  ];
 
   // ------------------ Slideshow ------------------
   final List<String> images = [
@@ -37,10 +56,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   void initState() {
     super.initState();
 
+    _tts = FlutterTts();
+
     // Precargar imágenes para evitar parpadeos y asegurarnos que carguen.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       precacheImage(const AssetImage("assets/images/kualli.gif"), context);
       precacheImage(const AssetImage("assets/images/logo.png"), context);
+      _speakNextGreeting();
+      _startGreetingLoop();
     });
 
     // Animación tipo "Siri pulse"
@@ -89,7 +112,49 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     _animationController.dispose();
     _kualliController.dispose();
     _timer.cancel();
+    _stopGreetings();
     super.dispose();
+  }
+
+  Future<void> _initTts() async {
+    await _tts.setLanguage("es-MX");
+    await _tts.setPitch(1.4); // mismo tono adorable que en México
+    await _tts.setSpeechRate(0.45);
+    await _tts.setVolume(1.0);
+    await _tts.awaitSpeakCompletion(true);
+  }
+
+  Future<void> _speak(String text) async {
+    if (text.trim().isEmpty) return;
+    await _tts.stop();
+    await _tts.speak(text);
+  }
+
+  Future<void> _ensureTtsReady() async {
+    if (_ttsReady) return;
+    await _initTts();
+    _ttsReady = true;
+  }
+
+  Future<void> _speakNextGreeting() async {
+    await _ensureTtsReady();
+    if (_greetings.isEmpty) return;
+    final text = _greetings[_greetIndex % _greetings.length];
+    _greetIndex++;
+    await _speak(text);
+  }
+
+  void _startGreetingLoop() {
+    _greetTimer?.cancel();
+    _greetTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _speakNextGreeting();
+    });
+  }
+
+  void _stopGreetings() {
+    _greetTimer?.cancel();
+    _greetTimer = null;
+    _tts.stop();
   }
 
   @override
@@ -272,6 +337,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           ),
                         ),
                         onPressed: () {
+                          _stopGreetings();
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -286,7 +352,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 size: 24, color: Colors.white),
                             SizedBox(width: 8),
                             Text(
-                              "---------------->",
+                              "¡Platica con Kualli!",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 21,
