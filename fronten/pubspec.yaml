@@ -72,6 +72,7 @@ flutter:
     - assets/lotties/voice_wave.json
     - assets/audio/
     - assets/images/
+    - assets/images/polos/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

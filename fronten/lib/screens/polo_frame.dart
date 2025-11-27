@@ -8,12 +8,14 @@ class Polo {
   final String estado;
   final String descripcion;
   final List<String> fotos;
+  final String qr;
 
   Polo({
     required this.nombre,
     required this.estado,
     required this.descripcion,
     required this.fotos,
+    required this.qr,
   });
 }
 
@@ -31,34 +33,28 @@ class _PoloFrameState extends State<PoloFrame> {
   // ------------------ LISTA DE POLOS ------------------
   final List<Polo> polosDelBienestar = [
     Polo(
-      nombre: "Polo de Bienestar de Minatitlán",
-      estado: "Veracruz",
+      nombre: "Polo de Bienestar AIFA",
+      estado: "Hidalgo",
       descripcion:
-          "Fortalecer el desarrollo comunitario y apoyar proyectos productivos.",
+          "¡Desliza para ver fotos!  ¡Escanea el código QR para más información!",
       fotos: [
-        "assets/images/polos/mina1.jpg",
-        "assets/images/polos/mina2.jpg",
+        "assets/images/polos/4.jpg",
+        "assets/images/polos/5.jpg",
       ],
+      qr: "assets/images/polos/polos.png",
     ),
+
     Polo(
-      nombre: "Polo de Bienestar de Ciudad Juárez",
-      estado: "Chihuahua",
+      nombre: "Polo de Bienestar de Seybaplaya",
+      estado: "Campeche",
       descripcion:
-          "Impulsa empleos dignos, capacitación y desarrollo regional.",
+          "¡Desliza para ver fotos!  ¡Escanea el código QR para más información!",
       fotos: [
-        "assets/images/polos/juarez1.jpg",
-        "assets/images/polos/juarez2.jpg",
+        "assets/images/polos/1.jpg",
+        "assets/images/polos/2.jpg",
+        "assets/images/polos/3.jpg",
       ],
-    ),
-    Polo(
-      nombre: "Polo de Bienestar de Acapulco",
-      estado: "Guerrero",
-      descripcion:
-          "Apoyo a reconstrucción, empleo temporal y reforzamiento económico local.",
-      fotos: [
-        "assets/images/polos/acapulco1.jpg",
-        "assets/images/polos/acapulco2.jpg",
-      ],
+      qr: "assets/images/polos/seybaplaya.png",
     ),
   ];
 
@@ -69,7 +65,7 @@ class _PoloFrameState extends State<PoloFrame> {
   void _nextPolo() {
     setState(() {
       currentIndex = (currentIndex + 1) % polosDelBienestar.length;
-      photosController.jumpToPage(0);
+      photosController.jumpToPage(0); // reinicia galería
     });
   }
 
@@ -93,85 +89,150 @@ class _PoloFrameState extends State<PoloFrame> {
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.white),
+        automaticallyImplyLeading: false,
       ),
 
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            // ------------------ TÍTULO + ESTADO + FLECHAS ------------------
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
+        children: [
+          // ============================================================
+          // CONTENIDO PRINCIPAL
+          // ============================================================
+          Padding(
+            padding: const EdgeInsets.all(40),
+            child: Column(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_left, size: 40),
-                  onPressed: _previousPolo,
+                // ------------------ TÍTULO + ESTADO + FLECHAS ------------------
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_left, size: 40),
+                      onPressed: _previousPolo,
+                    ),
+
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Text(
+                            poloActual.nombre,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 35,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF0A1A3B),
+                            ),
+                          ),
+                          Text(
+                            poloActual.estado,
+                            style: const TextStyle(
+                              fontSize: 30,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    IconButton(
+                      icon: const Icon(Icons.arrow_right, size: 40),
+                      onPressed: _nextPolo,
+                    ),
+                  ],
                 ),
 
-                Expanded(
-                  child: Column(
+                const SizedBox(height: 60),
+
+                // ------------------ GALERÍA ------------------
+                SizedBox(
+                  height: 350,
+                  child: PageView.builder(
+                    controller: photosController,
+                    itemCount: poloActual.fotos.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(18),
+                          child: Image.asset(
+                            poloActual.fotos[index],
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                // ------------------ DESCRIPCIÓN ------------------
+                Text(
+                  poloActual.descripcion,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 23),
+                ),
+
+                const SizedBox(height: 20),
+
+                // ------------------ QR CENTRADO ------------------
+                if (poloActual.qr.isNotEmpty)
+                  Column(
                     children: [
-                      Text(
-                        poloActual.nombre,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 26,
+                      const Text(
+                        "Escanea el código QR:",
+                        style: TextStyle(
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0A1A3B),
                         ),
                       ),
-                      Text(
-                        poloActual.estado,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          color: Colors.black54,
+
+                      const SizedBox(height: 10),
+
+                      Center(
+                        child: SizedBox(
+                          height: 220,
+                          child: Image.asset(
+                            poloActual.qr,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-
-                IconButton(
-                  icon: const Icon(Icons.arrow_right, size: 40),
-                  onPressed: _nextPolo,
-                ),
               ],
             ),
+          ),
 
-            const SizedBox(height: 25),
-
-            // ------------------ GALERÍA ------------------
-            SizedBox(
-              height: 280,
-              child: PageView.builder(
-                controller: photosController,
-                itemCount: poloActual.fotos.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(18),
-                      child: Image.asset(
-                        poloActual.fotos[index],
-                        fit: BoxFit.cover,
-                      ),
+          // ============================================================
+          // FLECHA LATERAL PARA REGRESAR
+          // ============================================================
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.45,
+            left: 10,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 6,
+                      spreadRadius: 1,
                     ),
-                  );
-                },
+                  ],
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  size: 40,
+                  color: Colors.black87,
+                ),
               ),
             ),
-
-            const SizedBox(height: 20),
-
-            // ------------------ DESCRIPCIÓN ------------------
-            Text(
-              poloActual.descripcion,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
