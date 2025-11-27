@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:sheinbot/screens/polo_frame.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import '../services/chat_service.dart';
 
@@ -10,10 +11,7 @@ class PlanMexicoScreen extends StatefulWidget {
 
 class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   List<Map<String, String>> messages = [
-    {
-      "sender": "bot",
-      "text": "¡Hola! Soy Kualli. ",
-    },
+    {"sender": "bot", "text": "¡Hola! Soy Kualli. "},
   ];
 
   final ScrollController _scrollController = ScrollController();
@@ -28,19 +26,26 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   final ChatService _chatService = ChatService();
   final FlutterTts _tts = FlutterTts();
   final ValueNotifier<String> _miniFrameText = ValueNotifier<String>(
-      "Aquí podrás ver más información relacionada con esta sección.");
+    "Aquí podrás ver más información relacionada con esta sección.",
+  );
   final Map<String, String> miniTexts = {
-    "Plan México\n": "El Plan México es una estrategia nacional que busca impulsar el crecimiento del país y mejorar la vida de las personas. \n\n¿Cómo lo hace?\n∘ Creando más empleos y fortaleciendo la industria mexicana.\n ∘ Atrayendo inversiones para construir carreteras, trenes, puertos, energía y más infraestructura.\n∘ Aumentando la producción en México, para depender menos del extranjero.\n∘ Impulsando la educación, ciencia y tecnología, para que más personas tengan oportunidades de estudiar y trabajar.\n∘ Reduciendo desigualdades, llevando desarrollo a todas las regiones del país.",
+    "Plan México\n":
+        "El Plan México es una estrategia nacional que busca impulsar el crecimiento del país y mejorar la vida de las personas. \n\n¿Cómo lo hace?\n∘ Creando más empleos y fortaleciendo la industria mexicana.\n ∘ Atrayendo inversiones para construir carreteras, trenes, puertos, energía y más infraestructura.\n∘ Aumentando la producción en México, para depender menos del extranjero.\n∘ Impulsando la educación, ciencia y tecnología, para que más personas tengan oportunidades de estudiar y trabajar.\n∘ Reduciendo desigualdades, llevando desarrollo a todas las regiones del país.",
 
-"Polos de\nBienestar": "Los Polos del Bienestar son espacios creados en diferentes regiones de México donde se desarrollan proyectos que impulsan el crecimiento económico y social.\nSu idea principal es llevar oportunidades a zonas que antes tenían poco apoyo, para que más personas puedan trabajar, aprender y mejorar su calidad de vida sin tener que mudarse lejos.\n∘ Cada Polo del Bienestar puede incluir:\n∘ Capacitación y educación para jóvenes y adultos.\n∘ Impulso a pequeñas empresas y emprendedores.\n∘ Proyectos productivos, como agricultura, manufactura o tecnología.\n∘ Espacios comunitarios que ayudan a mejorar el entorno.",
+    "Polos de\nBienestar":
+        "Los Polos del Bienestar son espacios creados en diferentes regiones de México donde se desarrollan proyectos que impulsan el crecimiento económico y social.\nSu idea principal es llevar oportunidades a zonas que antes tenían poco apoyo, para que más personas puedan trabajar, aprender y mejorar su calidad de vida sin tener que mudarse lejos.",
 
-"Apoyos\nEconómicos": "El Gobierno de México otorga apoyos económicos directos a personas y pequeños productores mediante programas sociales y productivos, como los destinados a la agricultura de pequeña escala, créditos accesibles y ayuda a familias en situación de vulnerabilidad. Estos apoyos buscan reforzar el ingreso, la seguridad alimentaria y la permanencia en las comunidades.",
+    "Apoyos\nEconómicos":
+        "El Gobierno de México otorga apoyos económicos directos a personas y pequeños productores mediante programas sociales y productivos, como los destinados a la agricultura de pequeña escala, créditos accesibles y ayuda a familias en situación de vulnerabilidad. Estos apoyos buscan reforzar el ingreso, la seguridad alimentaria y la permanencia en las comunidades.",
 
-"Capacitaciones\n": "Existen programas públicos de capacitación para el trabajo y formación en habilidades técnicas y digitales, tanto presenciales como en línea. A través de cursos, talleres y esquemas de aprendizaje en centros de trabajo, se busca que más personas puedan mejorar su perfil laboral, obtener un empleo formal o emprender actividades productivas propias.",
+    "Capacitaciones\n":
+        "Existen programas públicos de capacitación para el trabajo y formación en habilidades técnicas y digitales, tanto presenciales como en línea. A través de cursos, talleres y esquemas de aprendizaje en centros de trabajo, se busca que más personas puedan mejorar su perfil laboral, obtener un empleo formal o emprender actividades productivas propias.",
 
-"Construcción de\nCarreteras": "La construcción y modernización de carreteras federales, caminos rurales y alimentadores forma parte de los programas nacionales de infraestructura. Estas obras tienen el objetivo de conectar mejor regiones aisladas, facilitar el transporte de personas y mercancías, reducir tiempos de traslado y apoyar el desarrollo económico y social de las comunidades.",
+    "Construcción de\nCarreteras":
+        "La construcción y modernización de carreteras federales, caminos rurales y alimentadores forma parte de los programas nacionales de infraestructura. Estas obras tienen el objetivo de conectar mejor regiones aisladas, facilitar el transporte de personas y mercancías, reducir tiempos de traslado y apoyar el desarrollo económico y social de las comunidades.",
 
-"Empleos en mi\nLocalidad": "El Gobierno impulsa la generación de empleos a nivel local mediante nuevos proyectos de infraestructura, polos industriales y programas de inversión regional, además de herramientas como el Servicio Nacional de Empleo y bolsas de trabajo oficiales. A través de estas iniciativas se busca que las personas encuentren oportunidades laborales cerca de donde viven."
+    "Empleos en mi\nLocalidad":
+        "El Gobierno impulsa la generación de empleos a nivel local mediante nuevos proyectos de infraestructura, polos industriales y programas de inversión regional, además de herramientas como el Servicio Nacional de Empleo y bolsas de trabajo oficiales. A través de estas iniciativas se busca que las personas encuentren oportunidades laborales cerca de donde viven.",
   };
 
   @override
@@ -60,7 +65,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
 
   Future<void> _initTts() async {
     await _tts.setLanguage("es-MX");
-    await _tts.setPitch(1.4);      // tono más agudo/adorable
+    await _tts.setPitch(1.4); // tono más agudo/adorable
     await _tts.setSpeechRate(0.45); // ritmo un poco más lento
     await _tts.setVolume(1.0);
     await _tts.awaitSpeakCompletion(true);
@@ -98,8 +103,10 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     scrollToBottom();
   }
 
-  Future<bool> _typeOutText(String fullText,
-      {Duration step = const Duration(milliseconds: 80)}) async {
+  Future<bool> _typeOutText(
+    String fullText, {
+    Duration step = const Duration(milliseconds: 80),
+  }) async {
     if (_typingMsgIndex == null) return false;
     final words = fullText.split(RegExp(r'\\s+')).where((w) => w.isNotEmpty);
     String current = "";
@@ -169,8 +176,10 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     try {
       final response = await _chatService.sendMessage(query);
       if (updateMini) {
-        _miniFrameText.value =
-            _shortenResponse(response, maxWords: miniMaxWords);
+        _miniFrameText.value = _shortenResponse(
+          response,
+          maxWords: miniMaxWords,
+        );
       }
       if (logInChat) {
         final shortened = _shortenResponse(response, maxWords: botMaxWords);
@@ -252,18 +261,19 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   // ------------------ MINI FRAME SOBRE LOS BOTONES ------------------
   void _openMiniFrame(String title) {
     // Toma el texto definido para este botón; editable en miniTexts.
-    _miniFrameText.value = miniTexts[title] ??
+    _miniFrameText.value =
+        miniTexts[title] ??
         "Aquí podrás ver más información relacionada con esta sección.";
 
     // TTS para el botón Plan México
     if (title.trim().startsWith("Plan México")) {
       _speak(
-          "El Plan México quiere que México sea más fuerte, más justo y con mejores oportunidades para todas y todos.");
+        "El Plan México quiere que México sea más fuerte, más justo y con mejores oportunidades para todas y todos.",
+      );
     }
 
     if (title.trim().startsWith("Polos de\nBienestar")) {
-      _speak(
-          "WiWiWi");
+      _speak("WiWiWi");
     }
 
     final size = MediaQuery.of(context).size; // ancho/alto de la pantalla
@@ -275,8 +285,8 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
           child: Material(
             color: Colors.transparent,
             child: Container(
-              width: size.width * 0.9,   // antes 360
-            height: size.height * 0.6,
+              width: size.width * 0.9, // antes 360
+              height: size.height * 0.6,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 255, 255, 255),
                 borderRadius: BorderRadius.circular(24),
@@ -322,10 +332,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                   Positioned(
                     bottom: 12,
                     right: 12,
-                    child: Image.asset(
-                      "assets/images/pc.jpeg",
-                      height: 180,
-                    ),
+                    child: Image.asset("assets/images/pc.jpeg", height: 180),
                   ),
                 ],
               ),
@@ -351,13 +358,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
               shape: BoxShape.circle,
               color: color, // color personalizado
             ),
-            child: Center(
-              child: Icon(
-                icon,
-                size: 50,
-                color: Colors.white,
-              ),
-            ),
+            child: Center(child: Icon(icon, size: 50, color: Colors.white)),
           ),
           const SizedBox(height: 5),
           Text(
@@ -388,14 +389,15 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                     child: Text(
                       "-- PLAN MÉXICO --",
                       style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 40), // separación extra entre título y botones
+                const SizedBox(height: 40),
 
                 // ------------------ BOTONES ------------------
                 Padding(
@@ -455,7 +457,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: ListView.builder(
                       controller: _scrollController,
-                      reverse: true, // mensajes desde abajo hacia arriba
+                      reverse: true,
                       padding: const EdgeInsets.only(top: 10, bottom: 100),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
@@ -473,13 +475,21 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                                   isBot: isBot,
                                   color: isBot
                                       ? const Color.fromARGB(255, 249, 176, 142)
-                                      : const Color.fromARGB(255, 254, 241, 143),
+                                      : const Color.fromARGB(
+                                          255,
+                                          254,
+                                          241,
+                                          143,
+                                        ),
                                 ),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                      vertical: 14, horizontal: 18),
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 330),
+                                    vertical: 14,
+                                    horizontal: 18,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                    maxWidth: 330,
+                                  ),
                                   child: Text(
                                     msg["text"]!,
                                     style: TextStyle(
@@ -497,9 +507,43 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 130), // espacio para mic y mascota
+                const SizedBox(height: 130),
               ],
             ),
+
+            // 🔽🔽🔽🔽🔽🔽 NUEVA FLECHA A MITAD DE PANTALLA 🔽🔽🔽🔽🔽🔽
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.45, // mitad vertical
+              right: 10,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PoloFrame()),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 40,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ),
+            // 🔼🔼🔼🔼🔼🔼 FIN DE LA FLECHA 🔼🔼🔼🔼🔼🔼
 
             // ------------------ MASCOTA ------------------
             Positioned(
@@ -531,7 +575,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                         color: Colors.black26,
                         blurRadius: 8,
                         spreadRadius: 1,
-                      )
+                      ),
                     ],
                   ),
                   child: Icon(Icons.mic, color: Colors.white, size: 80),
@@ -556,8 +600,13 @@ class BubblePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = color;
 
-    final rrect =
-        RRect.fromLTRBR(0, 0, size.width, size.height, const Radius.circular(20));
+    final rrect = RRect.fromLTRBR(
+      0,
+      0,
+      size.width,
+      size.height,
+      const Radius.circular(20),
+    );
     canvas.drawRRect(rrect, paint);
 
     final path = Path();
