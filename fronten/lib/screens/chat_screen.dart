@@ -18,6 +18,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final List<Map<String, String>> _messages = [];
   bool _isLoading = false;
+  bool _ttsEnabled = true;
 
   @override
   void initState() {
@@ -31,11 +32,12 @@ class _ChatScreenState extends State<ChatScreen> {
     await _flutterTts.setLanguage("es-MX"); // Español de México
     await _flutterTts.setPitch(1.0);        // Tono normal
     await _flutterTts.setSpeechRate(0.5);   // Velocidad normal
+    await _flutterTts.awaitSpeakCompletion(true);
   }
 
   //  Función para hablar
   void _speak(String text) async {
-    if (text.isNotEmpty) {
+    if (_ttsEnabled && text.isNotEmpty) {
       await _flutterTts.speak(text);
     }
   }
@@ -43,6 +45,15 @@ class _ChatScreenState extends State<ChatScreen> {
   //  Función para detener la voz (por si habla mucho)
   void _stopSpeaking() async {
     await _flutterTts.stop();
+  }
+
+  void _toggleTts() {
+    setState(() {
+      _ttsEnabled = !_ttsEnabled;
+    });
+    if (!_ttsEnabled) {
+      _stopSpeaking();
+    }
   }
 
   void _sendMessage() async {
@@ -83,12 +94,11 @@ class _ChatScreenState extends State<ChatScreen> {
         title: const Text('SheinBot 🇲🇽'),
         backgroundColor: Colors.teal,
         actions: [
-          //  Botón opcional para callar al bot si habla mucho
           IconButton(
-            icon: const Icon(Icons.volume_off),
-            onPressed: _stopSpeaking,
-            tooltip: "Detener voz",
-          )
+            icon: Icon(_ttsEnabled ? Icons.volume_up : Icons.volume_off),
+            onPressed: _toggleTts,
+            tooltip: _ttsEnabled ? "Silenciar bot" : "Activar voz",
+          ),
         ],
       ),
       body: Column(
