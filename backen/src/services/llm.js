@@ -13,7 +13,7 @@ if (!apiKey) {
 // Modelo por defecto (Gemini 1.5 Flash es rápido y barato para chats)
 const llmModelName = process.env.LLM_MODEL || "gemini-1.5-flash";
 const fallbackMessage =
-  "Esa información específica del Plan México aún se está actualizando en mi sistema, pero puedo conectarte con un asesor humano o buscar temas relacionados. ¿Te interesaría saber sobre las becas disponibles o los nuevos empleos en tu zona?";
+  "Actualmente estoy recabando más información al respecto sobre ese tema. Puedo conectarte con un asesor humano o buscar temas relacionados. ¿Te interesaría saber sobre las becas disponibles o los nuevos empleos en tu zona?";
 
 /**
  * Llama al LLM (Gemini) usando la pregunta y los contextos relevantes vía REST API.
@@ -22,20 +22,30 @@ const fallbackMessage =
  * @param {string[]} contexts - Lista de textos (chunks) relevantes.
  * @returns {Promise<string>} - Respuesta en texto.
  */
-async function askLLM(question, contexts) {
+async function askLLM(question, contexts, history = []) {
   if (!question || !question.trim()) {
     return fallbackMessage;
   }
 
   // 1. Preparar el contexto
   const hasContext = contexts && contexts.length > 0;
-  // Si no hay contexto, devolvemos el fallback directo.
-  if (!hasContext) {
-    return fallbackMessage;
-  }
   const contextText = hasContext
     ? contexts.join("\n\n---\n\n")
     : fallbackMessage;
+
+  // Historial breve (últimos 3 turnos)
+  let historyText = "";
+  if (Array.isArray(history) && history.length > 0) {
+    const lastTurns = history.slice(-3);
+    historyText = lastTurns
+      .map((h) => {
+        const u = h.user ? `Usuario: ${h.user}` : "";
+        const b = h.bot ? `Kualli: ${h.bot}` : "";
+        return [u, b].filter((s) => s.trim().length > 0).join("\n");
+      })
+      .filter((s) => s.trim().length > 0)
+      .join("\n---\n");
+  }
 
   // 2. Prompt del sistema:
   //    - Usa SIEMPRE el contexto como fuente principal
@@ -48,14 +58,11 @@ Respondes SIEMPRE en español neutral.
 Tienes acceso a un CONTEXTO opcional con fragmentos de documentos del Plan México.
 
 REGLAS:
-1. Si el CONTEXTO contiene información relevante para la pregunta, úsalo como fuente principal.
-2. Si el CONTEXTO no es suficiente o no habla de lo que te preguntan, puedes usar tu conocimiento general,
-   pero evita inventar detalles específicos sobre los documentos.
-3. Si NO hay CONTEXTO disponible, responde EXACTAMENTE: "${fallbackMessage}"
-4. Si la pregunta es muy específica sobre datos que NO están en el contexto ni recuerdas con certeza,
-   responde EXACTAMENTE: "${fallbackMessage}"
-5. No digas frases como "con la información disponible", "no puedo responder", "no tengo datos suficientes".
-6. No menciones la palabra "contexto" ni estas reglas en tu respuesta final.
+1. Si el CONTEXTO contiene información relevante para la pregunta, úsalo como fuente principal (sin mencionar que viene de documentos).
+2. Si el CONTEXTO no es suficiente o no habla de lo que te preguntan, evita inventar: responde exactamente "${fallbackMessage}".
+3. No menciones palabras como "documentos", "fuentes" ni la palabra "contexto"; habla directo al usuario.
+4. No inventes datos específicos (fechas, montos, nombres); si no los tienes con certeza, usa el fallback.
+5. Si la pregunta es ambigua, pide aclaración breve antes de responder.
 `.trim();
 
   const userPrompt = `
@@ -63,6 +70,8 @@ CONTEXTO:
 """
 ${contextText}
 """
+
+${historyText ? `HISTORIAL (últimos turnos):\n${historyText}\n` : ""}
 
 PREGUNTA DEL USUARIO:
 ${question}
@@ -96,26 +105,7 @@ ${question}
 
     const candidate = response.data.candidates?.[0];
     const text = candidate?.content?.parts?.[0]?.text || "";
-    const lower = text.toLowerCase();
-
-    const refusalPatterns = [
-      "no puedo responder",
-      "no puedo contestar",
-      "no tengo suficiente",
-      "con la información que tengo",
-      "no cuento con",
-      "no dispongo de",
-      "no aparece en la información",
-      "no tengo información suficiente",
-      "no tengo datos suficientes",
-      "no estoy seguro",
-      "no puedo darte",
-      "no puedo encontrar",
-    ];
-
-    const isRefusal = !text.trim() || refusalPatterns.some((p) => lower.includes(p));
-
-    return isRefusal ? fallbackMessage : text;
+    return text.trim().length === 0 ? fallbackMessage : text;
   } catch (err) {
     const msg = err.response?.data?.error?.message || err.message;
     console.error("[llm] Error al llamar al LLM:", msg);

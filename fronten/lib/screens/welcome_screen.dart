@@ -275,7 +275,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   const SizedBox(height: 14),
 
                   Text(
-                    "Recorre apoyos, capacitaciones y oportunidades en tu región acompañad@ de Kualli.",
+                    "Recorre apoyos, capacitaciones y oportunidades en tu región con la compañía de Kualli.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 21,

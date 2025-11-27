@@ -11,7 +11,7 @@ class PlanMexicoScreen extends StatefulWidget {
 
 class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   List<Map<String, String>> messages = [
-    {"sender": "bot", "text": "¡Hola! Soy Kualli. "},
+    {"sender": "bot", "text": "¡Hola! Soy Kualli. ¡Vamos a platicar!"},
   ];
 
   final ScrollController _scrollController = ScrollController();
@@ -26,7 +26,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   final ChatService _chatService = ChatService();
   final FlutterTts _tts = FlutterTts();
   final ValueNotifier<String> _miniFrameText = ValueNotifier<String>(
-    "Aquí podrás ver más información relacionada con esta sección.",
+    "Escanea el código para visitar el sitio.",
   );
   final Map<String, String> miniTexts = {
     "Plan México\n":
@@ -41,10 +41,10 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     "Sitio Web":
         "Escanea el QR para acceder al sitio oficial del Plan México y conocer requisitos, apoyos y enlaces útiles.",
 
-    "Construcción de\nCarreteras":
+    "Carreteras":
         "Plan México impulsa la red carretera y logística con 8 proyectos (1,970 km) y mantenimiento por 34,348 mdp en 2025. Se modernizan ejes troncales, libramientos y tramos clave (Pachuca-Huejutla, Tepic-Compostela, Mitla-Tehuantepec), además de caminos artesanales y expansión aeroportuaria.\n\nObjetivos\n∘ Conectar Polos de Bienestar con puertos y fronteras\n∘ Restaurar 44 mil km de red federal (programa “Bachetón”)\n∘ Mejorar conectividad para turismo, comercio y comunidades",
 
-    "Empleos en mi\nLocalidad":
+    "Empleos":
         "\"Jóvenes Construyendo el Futuro\" es un programa del Gobierno de México que ofrece capacitación laboral y apoyo económico a jóvenes de entre 18 y 29.\nEl programa tiene como objetivo principal brindar oportunidades de desarrollo profesional a jóvenes, ayudándoles a adquirir habilidades y experiencia laboral en diferentes sectores.\n\nBeneficios de los Participantes\n∘ Apoyo económico\n∘ Seguro medico\n∘ Capacitación\n\nOportunidades Laborales\n∘ Trabajos Administrativos\n∘ Ventas y Comercio\n∘ Oficios",
   };
 
@@ -53,6 +53,12 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     super.initState();
     speech = stt.SpeechToText();
     _initTts();
+    // Reproducir saludo inicial una sola vez al abrir la pantalla.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (messages.isNotEmpty) {
+        _speak(messages.first["text"] ?? "");
+      }
+    });
   }
 
   @override
@@ -75,6 +81,11 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     if (text.trim().isEmpty) return;
     await _tts.stop();
     await _tts.speak(text);
+  }
+
+  String _cleanText(String text) {
+    // Quita asteriscos/markdown simples antes de mostrar o hablar.
+    return text.replaceAll('*', '').trim();
   }
 
   void addUserMessage(String text) {
@@ -174,17 +185,20 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     if (logInChat) addUserMessage(query);
     if (logInChat) _startTypingPlaceholder();
     try {
-      final response = await _chatService.sendMessage(query);
+      final historyPayload = _buildHistoryForBackend();
+      final response =
+          await _chatService.sendMessage(query, history: historyPayload);
+      final cleaned = _cleanText(response);
       if (updateMini) {
         _miniFrameText.value = _shortenResponse(
-          response,
+          cleaned,
           maxWords: miniMaxWords,
         );
       }
       if (logInChat) {
-        final shortened = _shortenResponse(response, maxWords: botMaxWords);
-        final typed = await _typeOutText(shortened);
-        if (!typed) addBotMessage(shortened);
+        final typed = await _typeOutText(cleaned);
+        await _speak(cleaned);
+        if (!typed) addBotMessage(cleaned);
       }
     } catch (e) {
       if (updateMini) _miniFrameText.value = "Error de conexión: $e";
@@ -192,11 +206,23 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     }
   }
 
+  List<Map<String, String>> _buildHistoryForBackend() {
+    // Tomamos los últimos 3 mensajes (pares user/bot) para contexto ligero.
+    final List<Map<String, String>> trimmed = [];
+    for (int i = messages.length - 1; i >= 0 && trimmed.length < 6; i--) {
+      final msg = messages[i];
+      trimmed.insert(0, {
+        msg["sender"] == "bot" ? "bot" : "user": msg["text"] ?? "",
+      });
+    }
+    return trimmed;
+  }
+
   void scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          _scrollController.position.minScrollExtent,
           duration: Duration(milliseconds: 400),
           curve: Curves.easeOut,
         );
@@ -251,6 +277,9 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     });
 
     final finalText = partialText.trim();
+    // Debug para verificar qué texto se envía desde voz
+    // ignore: avoid_print
+    print('[stt] final: "$finalText"');
     if (finalText.isNotEmpty) await _sendToBackend(finalText);
 
     partialText = "";
@@ -277,13 +306,13 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     if (title.trim().startsWith("Apoyos\nEconómicos")) {
       _speak("A continuación te muestro las opciones de apoyos económicos que nos ofrece el gobierno.");
     }
-    if (title.trim().startsWith("Empleos en mi\nLocalidad")) {
+    if (title.trim().startsWith("Empleos")) {
       _speak("Gracias al Programa Jóvenes construyendo el futuro miles de jóvenes mexicanos podrán capacitarse mientras trabajan en empleos de su localidad.");
     }
     if (title.trim().startsWith("Polos de\nBienestar")) {
-      _speak("WiWiWi");
+      _speak("Los Polos del Bienestar son zonas de desarrollo que buscan llevar empleo, crecimiento y oportunidades directamente a las comunidades.");
     }
-    if (title.trim().startsWith("Construcción de\nCarreteras")) {
+    if (title.trim().startsWith("Carreteras")) {
       _speak("Éstas son algunas de las carreteras que se han construido y remodelado con el plan México.");
     }
 
@@ -326,28 +355,34 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                         ),
                         const SizedBox(height: 12),
                         if (isSitioWeb)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _miniFrameText.value.isNotEmpty
-                                    ? _miniFrameText.value
-                                    : "Escanea el código para visitar el sitio.",
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black87,
+                          Builder(builder: (_) {
+                            // Para el mini frame de Sitio Web quitamos saltos y dejamos el texto en una sola línea.
+                            final display = _miniFrameText.value
+                                .replaceAll(RegExp(r'\s*\n\s*'), ' ')
+                                .trim();
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  display.isNotEmpty
+                                      ? display
+                                      : "Escanea el código para visitar el sitio.",
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black87,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 16),
-                              Center(
-                                child: Image.asset(
-                                  "assets/images/qr.jpeg",
-                                  height: 320,
-                                  fit: BoxFit.contain,
+                                const SizedBox(height: 16),
+                                Center(
+                                  child: Image.asset(
+                                    "assets/images/qr.jpeg",
+                                    height: 320,
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          )
+                              ],
+                            );
+                          })
                         else
                           ValueListenableBuilder<String>(
                             valueListenable: _miniFrameText,
@@ -384,24 +419,27 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
       onTap: () {
         _openMiniFrame(label);
       },
-      child: Column(
-        children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color, // color personalizado
+      child: SizedBox(
+        width: 120,
+        child: Column(
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color, // color personalizado
+              ),
+              child: Center(child: Icon(icon, size: 50, color: Colors.white)),
             ),
-            child: Center(child: Icon(icon, size: 50, color: Colors.white)),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
-          ),
-        ],
+            const SizedBox(height: 6),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -470,12 +508,12 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                           ),
                           buildIconButton(
                             Icons.alt_route_rounded,
-                            "Construcción de\nCarreteras",
+                            "Carreteras",
                             const Color.fromARGB(255, 184, 81, 81),
                           ),
                           buildIconButton(
                             Icons.work_rounded,
-                            "Empleos en mi\nLocalidad",
+                            "Empleos",
                             const Color.fromARGB(255, 213, 112, 112),
                           ),
                         ],
@@ -584,7 +622,16 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
             Positioned(
               bottom: 0,
               left: -20, // más hacia la izquierda
-              child: Image.asset("assets/images/kualli.gif", height: 200),
+              child: GestureDetector(
+                onTap: () {
+                  _tts.stop(); // cortar la respuesta actual del TTS
+                },
+                behavior: HitTestBehavior.translucent,
+                child: Image.asset(
+                  "assets/images/kualli.gif",
+                  height: 200,
+                ),
+              ),
             ),
 
             // ------------------ MICRÓFONO ------------------

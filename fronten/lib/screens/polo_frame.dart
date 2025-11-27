@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sheinbot/screens/mexico_screen.dart';
+import 'package:sheinbot/screens/polo_voice_screen.dart';
 
 /// ------------------------------------------------------------
 /// MODELO POLO (top-level)
@@ -226,6 +228,37 @@ class _PoloFrameState extends State<PoloFrame> {
                 ),
                 child: const Icon(
                   Icons.arrow_back_ios,
+                  size: 40,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
+          ),
+
+          // Botón derecho para abrir un nuevo frame con micrófono
+          Positioned(
+            top: MediaQuery.of(context).size.height * 0.45,
+            right: 10,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => const PoloVoiceScreen()));
+              },
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.arrow_forward_ios,
                   size: 40,
                   color: Colors.black87,
                 ),

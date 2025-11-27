@@ -9,7 +9,7 @@ const { searchRelevantChunks } = require('../services/search');
 const { askLLM } = require('../services/llm');
 
 router.post('/', async (req, res) => {
-  const { question } = req.body;
+  const { question, history = [] } = req.body;
 
   if (!question || !question.trim()) {
     return res.status(400).json({ ok: false, error: "La pregunta es requerida." });
@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
 
     // PASO 3: Generar la respuesta con IA (RAG)
     // Le enviamos al LLM la pregunta original + la información encontrada.
-    const answer = await askLLM(question, contexts);
+    const answer = await askLLM(question, contexts, history);
 
     // PASO 4: Responder al Frontend
     res.json({
