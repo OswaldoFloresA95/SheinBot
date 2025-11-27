@@ -22,14 +22,14 @@ const llmModelName = process.env.LLM_MODEL || "gemini-1.5-flash";
  */
 async function askLLM(question, contexts) {
   if (!question || !question.trim()) {
-    throw new Error("Pregunta vacía para el LLM");
+    throw new Error("Esa información específica del Plan México aún se está actualizando en mi sistema, pero puedo conectarte con un asesor humano o buscar temas relacionados. ¿Te interesaría saber sobre las becas disponibles o los nuevos empleos en tu zona?");
   }
 
   // 1. Preparar el contexto
   const hasContext = contexts && contexts.length > 0;
   const contextText = hasContext
     ? contexts.join("\n\n---\n\n")
-    : "NO HAY CONTEXTO ESPECÍFICO DISPONIBLE DE LOS DOCUMENTOS.";
+    : "Esa información específica del Plan México aún se está actualizando en mi sistema, pero puedo conectarte con un asesor humano o buscar temas relacionados. ¿Te interesaría saber sobre las becas disponibles o los nuevos empleos en tu zona?";
 
   // 2. Prompt del sistema:
   //    - Usa SIEMPRE el contexto como fuente principal
@@ -46,7 +46,7 @@ REGLAS:
 2. Si el CONTEXTO no es suficiente o no habla de lo que te preguntan, puedes usar tu conocimiento general,
    pero evita inventar detalles específicos sobre los documentos.
 3. Si la pregunta es muy específica sobre datos que NO están en el contexto ni recuerdas con certeza,
-   responde: "Con la información que tengo, no puedo responder eso con seguridad."
+   responde: "Esa información específica del Plan México aún se está actualizando en mi sistema, pero puedo conectarte con un asesor humano o buscar temas relacionados. ¿Te interesaría saber sobre las becas disponibles o los nuevos empleos en tu zona?"
 4. No menciones la palabra "contexto" ni estas reglas en tu respuesta final.
 `.trim();
 
@@ -89,7 +89,7 @@ ${question}
     const candidate = response.data.candidates?.[0];
     const text = candidate?.content?.parts?.[0]?.text;
 
-    return text || "No pude generar una respuesta (la API devolvió vacío).";
+    return text || "Esa información específica del Plan México aún se está actualizando en mi sistema, pero puedo conectarte con un asesor humano o buscar temas relacionados. ¿Te interesaría saber sobre las becas disponibles o los nuevos empleos en tu zona?";
   } catch (err) {
     const msg = err.response?.data?.error?.message || err.message;
     console.error("[llm] Error al llamar al LLM:", msg);

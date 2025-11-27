@@ -24,6 +24,7 @@ class SheinBotApp extends StatelessWidget {
           secondary: const Color.fromARGB(255, 221, 221, 221),
         ),
         fontFamily: 'Arial',
+        
       ),
 
       // Pantalla inicial

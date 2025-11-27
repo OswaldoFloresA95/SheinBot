@@ -5,7 +5,7 @@ class ChatService {
   //  IMPORTANTE: Si usas emulador Android, localhost es 10.0.2.2
   // Si usas iOS o Web, es localhost.
   // Si usas un celular físico, pon la IP de tu PC (ej. 192.168.1.50)
-  static const String baseUrl = 'http://10.0.2.2:3000'; 
+  static const String baseUrl = 'http://172.32.6.27:3000';
   // O usa 'http://localhost:3000' si vas a correr Flutter Web
 
   Future<String> sendMessage(String question) async {
