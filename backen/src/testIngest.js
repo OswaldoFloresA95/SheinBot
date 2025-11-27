@@ -25,7 +25,16 @@ async function main() {
     // "https://codeso.mx/plan-sonora/",
     // "https://www.gob.mx/conavi/acciones-y-programas/programa-de-vivienda-para-el-bienestar-2025",
 
-    "https://www.proyectosmexico.gob.mx/proyecto_inversion/polos-de-desarrollo-economico-para-el-bienestar/"
+    "https://www.proyectosmexico.gob.mx/proyecto_inversion/polos-de-desarrollo-economico-para-el-bienestar/",
+    "https://www.proyectosmexico.gob.mx/proyecto_inversion/1001-podecobi-seybaplaya-i-campeche/",
+    "https://www.proyectosmexico.gob.mx/proyecto_inversion/1002-podecobi-san-jeronimo-chihuahua/",
+    "https://www.proyectosmexico.gob.mx/proyecto_inversion/1003-podecobi-chetumal-quintana-roo/",
+    "https://www.proyectosmexico.gob.mx/proyecto_inversion/1005-podecobi-reserva-zapotlan-hidalgo/",
+    "https://www.proyectosmexico.gob.mx/proyecto_inversion/1006-podecobi-parque-industrial-bajio-michoacan/",
+    "https://www.proyectosmexico.gob.mx/proyecto_inversion/1015-podecobi-nezahualcoyotl-estado-de-mexico/",
+    "https://www.gob.mx/becasbenitojuarez/articulos/calendario-de-pago-primer-bimestre-2025-beca-benito-juarez?idiom=es",
+    "https://www.gob.mx/becasbenitojuarez/es/articulos/conoce-todo-sobre-la-beca-jovenes-escribiendo-el-futuro",
+    "https://www.gob.mx/se/acciones-y-programas/polos-de-desarrollo-economico-para-el-bienestar",
     
 
   ];
