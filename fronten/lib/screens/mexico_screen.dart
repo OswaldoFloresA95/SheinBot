@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import '../services/chat_service.dart';
 
 class PlanMexicoScreen extends StatefulWidget {
   @override
@@ -20,6 +21,9 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   int? listeningMsgIndex;
   late stt.SpeechToText speech;
   bool isListening = false;
+  final ChatService _chatService = ChatService();
+  final ValueNotifier<String> _miniFrameText = ValueNotifier<String>(
+      "Aquí podrás ver más información relacionada con esta sección.");
 
   @override
   void initState() {
@@ -30,6 +34,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   @override
   void dispose() {
     speech.stop();
+    _miniFrameText.dispose();
     super.dispose();
   }
 
@@ -47,6 +52,29 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
       if (messages.length > 20) messages.removeAt(0);
     });
     scrollToBottom();
+  }
+
+  String _trimWords(String text, int maxWords) {
+    final words = text.split(RegExp(r'\s+'));
+    if (words.length <= maxWords) return text;
+    return words.take(maxWords).join(' ') + '...';
+  }
+
+  Future<void> _sendToBackend(
+    String text, {
+    bool updateMini = false,
+    bool logInChat = true,
+    int miniMaxWords = 60,
+    int botMaxWords = 60,
+  }) async {
+    final query = text.trim();
+    if (query.isEmpty) return;
+    if (logInChat) addUserMessage(query);
+    final response = await _chatService.sendMessage(query);
+    if (updateMini) {
+      _miniFrameText.value = _trimWords(response, miniMaxWords);
+    }
+    if (logInChat) addBotMessage(_trimWords(response, botMaxWords));
   }
 
   void scrollToBottom() {
@@ -102,7 +130,7 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
     });
 
     final finalText = partialText.trim();
-    if (finalText.isNotEmpty) addUserMessage(finalText);
+    if (finalText.isNotEmpty) await _sendToBackend(finalText);
 
     partialText = "";
     listeningMsgIndex = null;
@@ -110,6 +138,9 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
 
   // ------------------ MINI FRAME SOBRE LOS BOTONES ------------------
   void _openMiniFrame(String title) {
+    _miniFrameText.value = 'Consultando sobre "$title"...';
+    _sendToBackend(title, updateMini: true, logInChat: false);
+
     final size = MediaQuery.of(context).size; // ancho/alto de la pantalla
     showDialog(
       context: context,
@@ -148,12 +179,17 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          "Aquí podrás ver más información relacionada con esta sección.",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.black87,
-                          ),
+                        ValueListenableBuilder<String>(
+                          valueListenable: _miniFrameText,
+                          builder: (_, value, __) {
+                            return Text(
+                              value,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                color: Colors.black87,
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -178,7 +214,9 @@ class _PlanMexicoScreenState extends State<PlanMexicoScreen> {
   // ------------------ WIDGET BOTONES ------------------
   Widget buildIconButton(IconData icon, String label, Color color) {
     return GestureDetector(
-      onTap: () => _openMiniFrame(label),
+      onTap: () {
+        _openMiniFrame(label);
+      },
       child: Column(
         children: [
           Container(
