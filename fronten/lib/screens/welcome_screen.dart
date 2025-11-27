@@ -233,7 +233,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   SlideTransition(
                     position: _kualliSlide,
                     child: Transform.translate(
-                      offset: const Offset(0, -12),
+                      offset: const Offset(0, -12), // centrado
                       child: Image.asset(
                         "assets/images/kualli.gif",
                         height: 280,
